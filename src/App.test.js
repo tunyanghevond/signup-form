@@ -40,14 +40,54 @@ test('should be able to type an confirm password', () => {
 })
 
 test('should show email error massage on invalid email', () => {
+  render(<App />)
+  const emailErrorElement = screen.queryByText(
+    /the email you input is invalid/i
+  ) //null
+
   const emailInputElement = screen.getByRole('textbox', {
     name: /email/i,
   })
-  userEvent.type(emailInputElement, 'selenagmail.com')
+
   const submitBtnElement = screen.getByRole('button', {
     name: /submit/i,
   })
+
+  expect(emailErrorElement).not.toBeInTheDocument()
+
+  userEvent.type(emailInputElement, 'selenagmail.com')
+
   userEvent.click(submitBtnElement)
-  const emailErrorElement = screen.getByText(/the email you input is invalid/i)
-  expect(emailErrorElement).toBeInTheDocument
+
+  const emailErrorElementAgain = screen.queryByText(
+    /the email you input is invalid/i
+  )
+
+  expect(emailErrorElementAgain).toBeInTheDocument()
+})
+
+test('should show password error if password is less than 5 characters ', () => {
+  render(<App />)
+  const emailInputElement = screen.getByRole('textbox', {
+    name: /email/i,
+  })
+  const passwordInputElement = screen.getByLabelText('Password')
+  const passwordErrorElement = screen.queryByText(
+    /the password you entered should contain 5 or more characters/i
+  )
+
+  const submitBtnElement = screen.getByRole('button', {
+    name: /submit/i,
+  })
+
+  userEvent.type(emailInputElement, 'selena@gmail.com')
+  expect(passwordErrorElement).not.toBeInTheDocument()
+
+  userEvent.type(passwordInputElement, '123')
+  userEvent.click(submitBtnElement)
+
+  const passwordErrorElementAgain = screen.queryByText(
+    /the password you entered should contain 5 or more characters/i
+  )
+  expect(passwordErrorElementAgain).toBeInTheDocument()
 })

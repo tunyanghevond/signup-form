@@ -1,6 +1,28 @@
+import { useState } from 'react'
 import './App.css'
+import validator from 'validator'
 
 function App() {
+  const [signupInput, setSignupInput] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+  })
+  const [error, setError] = useState('')
+  const handleChange = (e) => {
+    setSignupInput({
+      ...signupInput,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  const handleClick = (e) => {
+    e.preventDefault()
+    if (!validator.isEmail(signupInput.email)) {
+      return setError('The email you input is invalid.')
+    }
+  }
+
   return (
     <div className='container my-5'>
       <form>
@@ -13,6 +35,8 @@ function App() {
             id='email'
             className='form-control'
             name='email'
+            value={signupInput.email}
+            onChange={handleChange}
           />
         </div>
         <div className='mb-3'>
@@ -24,6 +48,8 @@ function App() {
             id='password'
             className='form-control'
             name='password'
+            value={signupInput.password}
+            onChange={handleChange}
           />
         </div>
         <div className='mb-3'>
@@ -34,9 +60,15 @@ function App() {
             type='password'
             id='confirm-password'
             className='form-control'
-            name='confirm-password'
+            name='confirmPassword'
+            value={signupInput.confirmPassword}
+            onChange={handleChange}
           />
         </div>
+        {error && <p className='text-danger'>{error}</p>}
+        <button type='submit' className='btn btn-primary' onClick={handleClick}>
+          Submit
+        </button>
       </form>
     </div>
   )

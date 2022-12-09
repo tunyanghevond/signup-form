@@ -4,7 +4,7 @@ import App from './App'
 
 // 1) Rendering the component we want to test
 // 2) Finding the elements
-// 3)Assertion
+// 3) Assertion
 // test driven development approach
 
 test('inputs should be initially empty', () => {
@@ -68,10 +68,13 @@ test('should show email error massage on invalid email', () => {
 
 test('should show password error if password is less than 5 characters ', () => {
   render(<App />)
+
   const emailInputElement = screen.getByRole('textbox', {
     name: /email/i,
   })
+
   const passwordInputElement = screen.getByLabelText('Password')
+
   const passwordErrorElement = screen.queryByText(
     /the password you entered should contain 5 or more characters/i
   )
@@ -81,13 +84,78 @@ test('should show password error if password is less than 5 characters ', () => 
   })
 
   userEvent.type(emailInputElement, 'selena@gmail.com')
+
   expect(passwordErrorElement).not.toBeInTheDocument()
 
   userEvent.type(passwordInputElement, '123')
+
   userEvent.click(submitBtnElement)
 
   const passwordErrorElementAgain = screen.queryByText(
     /the password you entered should contain 5 or more characters/i
   )
   expect(passwordErrorElementAgain).toBeInTheDocument()
+})
+
+test("should show confirm password error if password is don't match", () => {
+  render(<App />)
+  // Finding the elements
+  const emailInputElement = screen.getByRole('textbox', {
+    name: /email/i,
+  })
+  const passwordInputElement = screen.getByLabelText('Password')
+  const confirmPasswordInputElement = screen.getByLabelText(/confirm password/i)
+  const confirmPasswordErrorElement = screen.queryByText(
+    /the password don't match. try again/i
+  )
+  const submitBtnElement = screen.getByRole('button', {
+    name: /submit/i,
+  })
+
+  // Assertion
+  userEvent.type(emailInputElement, 'selena@gmail.com')
+  userEvent.type(passwordInputElement, '12345')
+  expect(confirmPasswordErrorElement).not.toBeInTheDocument()
+
+  userEvent.type(confirmPasswordInputElement, '123456')
+  userEvent.click(submitBtnElement)
+
+  const passwordErrorElementAgain = screen.queryByText(
+    /the password don't match. try again/i
+  )
+  expect(passwordErrorElementAgain).toBeInTheDocument()
+})
+
+test('should show no error message if every input is valid', () => {
+  render(<App />)
+  // Finding the elements
+  const emailInputElement = screen.getByRole('textbox', {
+    name: /email/i,
+  })
+  const passwordInputElement = screen.getByLabelText('Password')
+  const confirmPasswordInputElement = screen.getByLabelText(/confirm password/i)
+
+  const submitBtnElement = screen.getByRole('button', {
+    name: /submit/i,
+  })
+
+  // Assertion
+  userEvent.type(emailInputElement, 'selena@gmail.com')
+  userEvent.type(passwordInputElement, '12345')
+  userEvent.type(confirmPasswordInputElement, '12345')
+  userEvent.click(submitBtnElement)
+
+  const emailErrorElement = screen.queryByText(
+    /the email you input is invalid/i
+  )
+  const passwordErrorElement = screen.queryByText(
+    /the password don't match. try again/i
+  )
+  const confirmPasswordErrorElement = screen.queryByText(
+    /the password don't match. try again/i
+  )
+
+  expect(emailErrorElement).not.toBeInTheDocument()
+  expect(passwordErrorElement).not.toBeInTheDocument()
+  expect(confirmPasswordErrorElement).not.toBeInTheDocument()
 })
